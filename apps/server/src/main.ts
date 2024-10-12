@@ -22,7 +22,7 @@ app.get('/api/hello', (req,res) => {
   res.json({message: "Hello, Frontend?"})
 })
 
-const port = process.env.PORT || 3333;
+const port = process.env.PORT || 3000;
 const server = app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}/api`);
 });

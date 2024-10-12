@@ -7,7 +7,7 @@ const uzairWelcome: FC<uzairWelcomeProps> = ({ }) => {
     const handleClick = async () => {
         try {
             // Make a GET request to the backend
-            const response = await axios.get('http://localhost:3333/api/hello');
+            const response = await axios.get('http://localhost:3000/api/hello');
             // Display the message in an alert
             alert(response.data.message);
         } catch (error) {
