@@ -5,10 +5,15 @@
 
 import express from 'express';
 import mongoose from 'mongoose'
-import userRoutes from './routes/userRoutes'
 import dotenv from 'dotenv'
 import helmet from 'helmet';
 import cors from 'cors';
+
+import userRoutes from './routes/userRoutes'
+import courseRoutes from './routes/courseRoutes'
+import announcementRoutes from './routes/announcementRoutes'
+import discussionRoutes from './routes/discussionRouter'
+import contentRoutes from './routes/contentRoutes'
 
 dotenv.config();
 const app = express();
@@ -22,8 +27,11 @@ mongoose.connect(mongooseURI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((error) => console.error('Error connecting to MongoDB:', error));
 
-
 app.use('/api', userRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/courses', announcementRoutes);
+app.use('/api/courses', discussionRoutes);
+app.use('/api/courses', contentRoutes);
 
 app.get('/api/hello', (req, res) => {
   res.json({ message: "Hello, Frontend?" })
@@ -32,4 +40,5 @@ app.get('/api/hello', (req, res) => {
 const server = app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}/api`);
 });
+
 server.on('error', console.error);
