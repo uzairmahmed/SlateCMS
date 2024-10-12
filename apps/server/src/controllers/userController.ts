@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 import dotenv from 'dotenv';
 
-import User from '../models/userModel';
+import { User } from '../models/userModels';
 
 // Source: https://medium.com/@ravipatel.it/building-a-secure-user-registration-and-login-api-with-express-js-mongodb-and-jwt-10b6f8f3741d
 
@@ -71,7 +71,7 @@ export const getUserDetails = async (req: Request, res: Response) => {
         Needs Authenticated Bearer Token
         Query Params: "email": <email>
     */
-   const query = req.query.email
+    const query = req.query.email
     try {
         const user = await User.findOne({ email: query })
         if (!user) {
