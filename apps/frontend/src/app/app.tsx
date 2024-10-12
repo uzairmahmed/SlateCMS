@@ -1,9 +1,9 @@
-import NxWelcome from './nx-welcome';
+import UzairWelcome from './uzairWelcome';
 
 export function App() {
   return (
     <div>
-      <NxWelcome title="frontend" />
+      <UzairWelcome />
     </div>
   );
 }
