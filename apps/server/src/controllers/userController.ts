@@ -58,7 +58,7 @@ export const loginUser = async (req: Request, res: Response) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ email: user.email }, jwtSecret, { expiresIn: '1800s' });
+        const token = jwt.sign({ email: user.email }, jwtSecret, { expiresIn: '1h' });
         res.status(200).json({ token, user: { email: user.email } }); // Need to add more variables here for user role etc etc
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
@@ -71,8 +71,9 @@ export const getUserDetails = async (req: Request, res: Response) => {
         Needs Authenticated Bearer Token
         Query Params: "email": <email>
     */
+   const query = req.query.email
     try {
-        const user = await User.findOne({ email: req.body.email })
+        const user = await User.findOne({ email: query })
         if (!user) {
             return res.status(404).json({ error: 'User Not Found' });
         }
