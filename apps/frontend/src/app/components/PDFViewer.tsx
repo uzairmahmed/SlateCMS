@@ -4,10 +4,11 @@ import { Document, Page, pdfjs } from 'react-pdf';
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 interface PDFViewerProps {
-    url: string
+    url: string,
+    corsBypass: boolean
 }
 
-const PDFViewer: FC<PDFViewerProps> = ({ url }) => {
+const PDFViewer: FC<PDFViewerProps> = ({ url, corsBypass }) => {
     const [numPages, setNumPages] = useState<number>();
 
     const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
@@ -17,15 +18,15 @@ const PDFViewer: FC<PDFViewerProps> = ({ url }) => {
 
 
     return (
-        <div className=' flex flex-col mt-4'>
+        <div className=' flex flex-col m-5 p-5 border'>
             <Document
-                file={url}
+                file={corsBypass? `https://cors-anywhere.herokuapp.com/${url}` : url}
                 onLoadSuccess={onDocumentLoadSuccess}
-                className='w-full'
+                className=''
             >
                 {numPages ? (
                     Array.from(new Array(numPages), (el, index) => (
-                        <div key={`page_${index + 1}`} className="mb-8">
+                        <div key={`page_${index + 1}`} className="mb-8 flex justify-center">
                             <Page pageNumber={index + 1} renderTextLayer={false} renderAnnotationLayer={false} />
                         </div>
                     ))
