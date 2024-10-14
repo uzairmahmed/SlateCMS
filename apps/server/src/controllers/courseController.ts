@@ -206,13 +206,18 @@ export const assignStudentsToCourse = async (req: Request, res: Response) => {
 
         await Course.updateOne(
             { courseCode: courseCode },
-            { $addToSet: { students: { $each: studentIds } } }
+            { $set: { students: studentIds } }
         );
 
 
         const updatedStudents = await Student.updateMany(
             { _id: { $in: studentIds } },
             { $addToSet: { courses: course._id } }
+        );
+
+        await Student.updateMany(
+            { _id: { $nin: studentIds }, courses: course._id },
+            { $pull: { courses: course._id } }
         );
 
         res.status(200).json({ message: 'Students assigned successfully', updatedStudents });
@@ -241,12 +246,17 @@ export const assignTeachersToCourse = async (req: Request, res: Response) => {
 
         await Course.updateOne(
             { courseCode: courseCode },
-            { $addToSet: { teachers: { $each: teacherIds } } }
+            { $set: { teachers: teacherIds } }
         );
 
         const updatedTeachers = await Teacher.updateMany(
             { _id: { $in: teacherIds } },
             { $addToSet: { courses: course._id } }
+        );
+
+        await Teacher.updateMany(
+            { _id: { $nin: teacherIds }, courses: course._id },
+            { $pull: { courses: course._id } }
         );
 
         res.status(200).json({ message: 'Teachers assigned successfully', updatedTeachers });

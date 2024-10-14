@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Course } from "../models/courseModels";
 import { DiscussionThread, DiscussionReply } from "../models/discussionModels";
 import { v4 as uuidv4 } from 'uuid';
+import { Notification } from '../models/notificationModels';
 
 export const createDiscussionThread = async (req: Request, res: Response) => {
     /*
@@ -38,6 +39,13 @@ export const createDiscussionThread = async (req: Request, res: Response) => {
 
         course.discussions.push(newThread._id);
         await course.save();
+
+        await Notification.create({
+            type: 'discussion',
+            message: `New discussion thread: ${newThread.title}`,
+            course: course._id,
+            recipients: course.students.map(user => user._id),
+        })
 
         res.status(201).json(newThread);
     } catch (error) {
@@ -128,6 +136,13 @@ export const createDiscussionThreadReply = async (req: Request, res: Response) =
         // Add the reply to the discussion thread
         discussionThread.replies.push(newReply._id);
         await discussionThread.save();
+        
+        // await Notification.create({
+        //     type: 'discussionreply',
+        //     message: `New reply to "${discussionThread.title}"`,
+        //     course: course._id,
+        //     recipients: course.students.map(user => user._id),
+        // })
 
         res.status(201).json(newReply);
     } catch (error) {

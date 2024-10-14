@@ -14,6 +14,7 @@ import courseRoutes from './routes/courseRoutes'
 import announcementRoutes from './routes/announcementRoutes'
 import discussionRoutes from './routes/discussionRouter'
 import contentRoutes from './routes/contentRoutes'
+import notificationRoutes from './routes/notificationRoutes'
 
 dotenv.config();
 const app = express();
@@ -33,6 +34,7 @@ app.use('/api/courses', courseRoutes);
 app.use('/api/courses', announcementRoutes);
 app.use('/api/courses', discussionRoutes);
 app.use('/api/courses', contentRoutes);
+app.use('/api', notificationRoutes);
 
 app.get('/api/hello', (req, res) => {
   res.json({ message: "Hello, Frontend?" })

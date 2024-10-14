@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Course } from '../models/courseModels';
 import { Announcement } from '../models/announcementModels';
 import { v4 as uuidv4 } from 'uuid';
+import { Notification } from '../models/notificationModels';
 
 
 export const createAnnouncement = async (req: Request, res: Response) => {
@@ -16,10 +17,6 @@ export const createAnnouncement = async (req: Request, res: Response) => {
     try {
         const { title, message } = req.body;
         const { courseCode } = req.params;
-        console.log("req.user._id");
-        console.log(req.user);
-        console.log("req.user._id");
-
 
         if (!title || !message) {
             return res.status(400).json({ error: 'Title and message are required' });
@@ -38,12 +35,17 @@ export const createAnnouncement = async (req: Request, res: Response) => {
             author: req.user._id
         });
 
-        // Save the new announcement
         await newAnnouncement.save();
 
-        // Add the announcement to the course
         course.announcements.push(newAnnouncement._id);
         await course.save();
+
+        await Notification.create({
+            type: 'announcement',
+            message: `New announcement posted: ${newAnnouncement.title}`,
+            course: course._id,
+            recipients: course.students.map(user => user._id),
+        })
 
         res.status(201).json(newAnnouncement);
     } catch (error) {

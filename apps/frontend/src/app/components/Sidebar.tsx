@@ -2,6 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { logout } from '../../apis/auth';
 import { useNavigate } from 'react-router-dom';
 import { MdAndroid, MdLibraryBooks, MdLogout, MdMenu, MdOutlineViewQuilt, MdSchool } from 'react-icons/md';
+import { getNotifications } from '../../apis/api';
 
 interface SidebarProps { }
 
@@ -9,7 +10,7 @@ const Sidebar: FC<SidebarProps> = ({ }) => {
     const [courses, setCourses] = useState([]);
     const navigate = useNavigate();
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         logout();
         navigate('/');
         window.location.reload();

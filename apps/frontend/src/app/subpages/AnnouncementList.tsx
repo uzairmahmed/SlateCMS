@@ -30,8 +30,8 @@ const AnnouncementList: FC<AnnouncementListProps> = ({ announcements, course, re
                 <div className='flex flex-col sm:flex-row md:flex-col lg:flex-row w-full justify-end gap-5'>
                     {(getUserDetails().userType === "admin" &&
                         <>
-                            <AssignStudentModal courseCode={course.courseCode} course={course} />
-                            <AssignTeacherModal courseCode={course.courseCode} course={course} />
+                            <AssignStudentModal courseCode={course.courseCode} course={course} refresh={refresh}/>
+                            <AssignTeacherModal courseCode={course.courseCode} course={course} refresh={refresh}/>
                         </>
                     )}
                     {(getUserDetails().userType === "admin" || getUserDetails().userType === "teacher") &&

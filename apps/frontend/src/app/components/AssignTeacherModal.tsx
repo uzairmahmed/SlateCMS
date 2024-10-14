@@ -5,27 +5,22 @@ import { CourseWithUsers, User } from '../interfaces';
 interface AssignTeacherModalProps {
     courseCode: string,
     course: CourseWithUsers
+    refresh: () => void;
 }
 
-const AssignTeacherModal: FC<AssignTeacherModalProps> = ({ courseCode, course }) => {
-    const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+const AssignTeacherModal: FC<AssignTeacherModalProps> = ({ courseCode, course, refresh }) => {
+    const [selectedOptions, setSelectedOptions] = useState<User[]>([]);
     const [teachers, setTeachers] = useState<User[]>([]);
+    const [loading, setLoading] = useState(true)
 
-
-    useEffect(() => {
-        if (course.teachers.length > 0) {
-            setSelectedOptions(course.teachers)
+    const fetchTeachers = async () => {
+        try {
+            const teacherData = await getTeachers();
+            setTeachers(teacherData);
+        } catch (error) {
+            console.error("Error fetching teachers:", error);
         }
-        const fetchTeachers = async () => {
-            try {
-                const teacherData = await getTeachers();
-                setTeachers(teacherData);
-            } catch (error) {
-                console.error("Error fetching teachers:", error);
-            }
-        };
-        fetchTeachers();
-    }, []);
+    };
 
     const handleSelectOption = (value: string) => {
         if (selectedOptions.includes(value)) {
@@ -35,16 +30,23 @@ const AssignTeacherModal: FC<AssignTeacherModalProps> = ({ courseCode, course })
         }
     };
 
+    const handleLoad = () => {
+        setSelectedOptions(course.teachers)
+        fetchTeachers()
+
+        document.getElementById("assignteacher").showModal()
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log(selectedOptions);
-        await assignTeachersToCourse(courseCode, selectedOptions); // Adjust this function for teacher assignment
+        await assignTeachersToCourse(courseCode, selectedOptions);
+        refresh()
         document.getElementById("assignteacher")?.close();
     }
 
     return (
         <>
-            <button className="btn btn-neutral" onClick={() => document.getElementById("assignteacher").showModal()}>Add Teachers</button>
+            <button className="btn btn-neutral" onClick={() => handleLoad()}>Add Teachers</button>
             <dialog id={"assignteacher"} className="modal">
                 <form onSubmit={handleSubmit} className="modal-box">
                     <h3 className="font-bold text-lg">Assign Teachers to Course</h3>

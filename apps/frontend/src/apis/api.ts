@@ -20,6 +20,7 @@ export const loginUser = async (email: string, password: string) => {
     try {
         const response = await axios.request(config);
         saveLoginDetails(response.data)
+        await getNotifications()
         return true;
     } catch (error) {
         toast('Error logging in')
@@ -364,6 +365,29 @@ export const getAllContent = async () => {
 
         const response = await axios.request(config);
         return response.data
+    } catch (error) {
+        toast('Error fetching content')
+        throw error;
+    }
+}
+
+export const getNotifications = async () => {
+    try {
+        const config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${API_ENDPOINT}/notifications`,
+            headers: {
+                Authorization: getBearerToken(),
+            },
+        };
+
+        const response = await axios.request(config);
+        const notifications = response.data
+        notifications.forEach(notification => {
+            toast(`${notification.course.courseCode}:${notification.message}`)
+        });
+        // return response.data
     } catch (error) {
         toast('Error fetching content')
         throw error;
