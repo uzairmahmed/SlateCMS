@@ -24,8 +24,31 @@ export const checkLoggedIn = () => {
     }
 }
 
-export const saveLoginDetails = (token: string) => {
-    localStorage.setItem('bearerToken', token);
+export const getUserDetails = () => {
+    return {
+        email: localStorage.getItem('email'),
+        userType: localStorage.getItem('userType'),
+        userId: localStorage.getItem('userId')
+    }
+}
+
+export const saveLoginDetails = (data: any) => {
+    localStorage.setItem('bearerToken', data.token);
+    localStorage.setItem('email', data.user.email)
+    localStorage.setItem('userType', data.user.userType)
+    localStorage.setItem('userId', data.user._id)
+}
+
+export const saveCourseDetails = (data: any) => {
+    const list = data.map((course: any) => (
+        {
+            courseCode: course.courseCode,
+            name: course.name,
+            url: `/${course.courseCode}`,
+        }
+    ))
+    
+    localStorage.setItem('courses', JSON.stringify(list)); 
 }
 
 export const logout = () => {

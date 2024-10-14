@@ -4,7 +4,7 @@ import AnnouncementList from '../subpages/AnnouncementList';
 import ContentList from '../subpages/ContentList';
 import DiscussionList from '../subpages/DiscussionList';
 import DiscussionThreadPage from './DiscussionThreadPage';
-import { getCourseDataWithUsers } from '../../apis/api';
+import { getCourseData } from '../../apis/api';
 import { checkLoggedIn } from '../../apis/auth';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -27,7 +27,7 @@ const CourseShell: FC<CourseShellProps> = ({ }) => {
 
     const getData = async () => {
         if (courseCode) {
-            const courseData = await getCourseDataWithUsers(courseCode)
+            const courseData = await getCourseData(courseCode)
             setCourse(courseData)
         }
     }

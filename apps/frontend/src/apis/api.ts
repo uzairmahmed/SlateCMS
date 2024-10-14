@@ -19,7 +19,7 @@ export const loginUser = async (email: string, password: string) => {
 
     try {
         const response = await axios.request(config);
-        saveLoginDetails(response.data.token)
+        saveLoginDetails(response.data)
         return true;
     } catch (error) {
         toast('Error logging in')
@@ -27,13 +27,42 @@ export const loginUser = async (email: string, password: string) => {
     }
 };
 
+export const signUpUser = async (userType: string, email: string, password: string, name: string, phone: string) => {
+    const data = {
+        email: email,
+        password: password,
+        name: name,
+        phone: phone
+    }
 
-export const getCourses = async () => {
+    const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: `${API_ENDPOINT}/auth/register/${userType === 'teacher' ? 'teacher' : 'student'}`,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        data: data,
+    };
+
+    try {
+        const response = await axios.request(config);
+        toast('Created account')
+        return true;
+    } catch (error) {
+        console.log(error);
+        toast('Error creating account')
+        return false
+    }
+}
+
+
+export const getAllCourses = async () => {
     try {
         const config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: `${API_ENDPOINT}/courses`,
+            url: `${API_ENDPOINT}/all`,
             headers: {
                 Authorization: getBearerToken(),
             },
@@ -48,12 +77,32 @@ export const getCourses = async () => {
     }
 }
 
-export const getCourseDataWithUsers = async (courseCode: string) => {
+export const getCourses = async (userType: any, userId: any) => {
     try {
         const config = {
             method: 'get',
             maxBodyLength: Infinity,
-            url: `${API_ENDPOINT}/courses/${courseCode}/users`,
+            url: `${API_ENDPOINT}/courses?userType=${userType}&userId=${userId}`,
+            headers: {
+                Authorization: getBearerToken(),
+            },
+        };
+
+        const response = await axios.request(config);
+        console.log(JSON.stringify(response.data));
+        return response.data;
+    } catch (error) {
+        toast('Error fetching courses')
+        throw error;
+    }
+}
+
+export const getCourseData = async (courseCode: string) => {
+    try {
+        const config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${API_ENDPOINT}/courses/${courseCode}`,
             headers: {
                 Authorization: getBearerToken(),
             },
@@ -188,4 +237,118 @@ export const postDiscussion = async (courseCode: string, title: string, message:
         toast('Error posting announcement')
         throw error;
     }
-} 
+}
+
+export const createCourse = async (name: string, courseCode: string, description: string) => {
+    try {
+        let data = {
+            "name": name,
+            "courseCode": courseCode.trim(),
+            "description": description
+        }
+
+        const config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${API_ENDPOINT}/courses`,
+            headers: {
+                Authorization: getBearerToken(),
+            },
+            data: data
+        };
+
+        const response = await axios.request(config);
+        toast('Created Course')
+    } catch (error) {
+        toast('Error creating course')
+        throw error;
+    }
+}
+
+
+export const getStudents = async () => {
+    try {
+        const config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${API_ENDPOINT}/users/students`,
+            headers: {
+                Authorization: getBearerToken(),
+            },
+        };
+
+        const response = await axios.request(config);
+        return response.data
+    } catch (error) {
+        toast('Error fetching students')
+        throw error;
+    }
+}
+
+export const assignStudentsToCourse = async (courseCode: string, studentIds: string[]) => {
+    try {
+        let data = {
+            "studentIds": studentIds,
+        }
+
+        const config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${API_ENDPOINT}/courses/${courseCode}/assign-students`,
+            headers: {
+                Authorization: getBearerToken(),
+            },
+            data: data
+        };
+        const response = await axios.request(config);
+        toast('Assigned Students to Course')
+    } catch (error) {
+        toast('Error Assigning students to course')
+        throw error;
+    }
+
+}
+
+
+export const getTeachers = async () => {
+    try {
+        const config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${API_ENDPOINT}/users/teachers`,
+            headers: {
+                Authorization: getBearerToken(),
+            },
+        };
+
+        const response = await axios.request(config);
+        return response.data
+    } catch (error) {
+        toast('Error fetching teachers')
+        throw error;
+    }
+}
+
+export const assignTeachersToCourse = async (courseCode: string, teacherIds: string[]) => {
+    try {
+        let data = {
+            "teacherIds": teacherIds,
+        }
+
+        const config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${API_ENDPOINT}/courses/${courseCode}/assign-teachers`,
+            headers: {
+                Authorization: getBearerToken(),
+            },
+            data: data
+        };
+        const response = await axios.request(config);
+        toast('Assigned Teachers to Course')
+    } catch (error) {
+        toast('Error Assigning teachers to course')
+        throw error;
+    }
+
+}

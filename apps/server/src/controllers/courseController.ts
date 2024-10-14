@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import { Course } from '../models/courseModels';
 import { Content } from '../models/contentModels';
-import { Student, Teacher } from '../models/userModels';
+import { Student, Teacher, User } from '../models/userModels';
 import { v4 as uuidv4 } from 'uuid';
+import mongoose from 'mongoose';
 
 export const getAllCourses = async (req: Request, res: Response) => {
     /*
@@ -16,11 +17,41 @@ export const getAllCourses = async (req: Request, res: Response) => {
     }
 }
 
+export const getUserCourses = async (req: Request, res: Response) => {
+    /*
+    gets a list of all courses that a user signs up for
+    JSON Body:
+    {
+        "userID": <user ID>,
+        "userType": <userType>
+    }    
+    */
+    try {
+        const { userId, userType } = req.query;
+        const objectId = new mongoose.Types.ObjectId(userId as string);
+
+        let courses = []
+
+        if (userType === "admin") {
+            courses = await Course.find()
+        } else if (userType === 'teacher') {
+            courses = await Course.find({ teachers: { $in: [objectId] } })
+        } else {
+            courses = await Course.find({ students: { $in: [objectId] } })
+        }
+
+        res.status(200).json(courses);
+    } catch (error) {
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
 export const createCourse = async (req: Request, res: Response) => {
     /*
     creates a new course.
     JSON Body:
-    {ode
+    {
         "name": <course name>,
         "uid": <course unique identifier>,
         "description": <course description>
@@ -164,6 +195,12 @@ export const assignStudentsToCourse = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Course not found' });
         }
 
+        await Course.updateOne(
+            { courseCode: courseCode },
+            { $addToSet: { students: { $each: studentIds } } }
+        );
+
+
         const updatedStudents = await Student.updateMany(
             { _id: { $in: studentIds } },
             { $addToSet: { courses: course._id } }
@@ -192,6 +229,11 @@ export const assignTeachersToCourse = async (req: Request, res: Response) => {
         if (!course) {
             return res.status(404).json({ error: 'Course not found' });
         }
+
+        await Course.updateOne(
+            { courseCode: courseCode },
+            { $addToSet: { teachers: { $each: teacherIds } } }
+        );
 
         const updatedTeachers = await Teacher.updateMany(
             { _id: { $in: teacherIds } },

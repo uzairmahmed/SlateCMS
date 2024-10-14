@@ -11,6 +11,7 @@ import LoginPage from './pages/LoginPage';
 import { checkLoggedIn } from '../apis/auth';
 
 import 'react-toastify/dist/ReactToastify.css';
+import SignupPage from './pages/SignUpPage';
 
 export function App() {
     return (
@@ -18,11 +19,12 @@ export function App() {
             <div className="flex h-screen w-screen bg-gray-50 overflow-y-hidden">
                 <div className="w-80 border border-solid border-slate-200"></div>
                 <ToastContainer />
-                <Sidebar />
+                <Sidebar/>
                 <Routes>
-                    <Route path="*" element={<CoursesGrid />} />
+                    <Route path="*" element={<CoursesGrid/>} />
+                    <Route path="/signup" element={<SignupPage />} />
                     <Route path="/login" element={<LoginPage />} />
-                    <Route path="/courses" element={<CoursesGrid />} />
+                    <Route path="/courses" element={<CoursesGrid/>} />
                     <Route path="/:courseCode" element={<CourseShell />} />
                     <Route path="/discussion/:discussionID" element={<DiscussionThreadPage />} />
                 </Routes>

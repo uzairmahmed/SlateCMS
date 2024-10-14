@@ -10,7 +10,7 @@ const CourseCard: FC<CourseCardProps> = ({course}) => {
     const navigate = useNavigate()
 
     return (
-        <div className='flex flex-col bg-slate-100 shadow rounded-2xl p-10'>
+        <div className='flex flex-col h-fit bg-slate-100 shadow rounded-2xl p-10'>
             <h2 className='font-bold text-2xl'>{course.courseCode}</h2>
             <h3 className='font-semibold text-xl mb-2'>{course.name}</h3>
             <p>{course.description}</p>

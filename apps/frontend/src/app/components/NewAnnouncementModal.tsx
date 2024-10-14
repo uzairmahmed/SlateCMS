@@ -15,8 +15,8 @@ const NewAnnouncementModal: FC<NewAnnouncementModalProps> = ({ courseCode, refre
         await postAnnouncement(courseCode, title, message)
         setTitle("")
         setMessage("")
-        refresh()
         document.getElementById("newannouncement")?.close()
+        refresh()
     }
 
     return (
