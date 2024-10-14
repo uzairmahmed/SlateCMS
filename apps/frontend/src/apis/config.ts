@@ -1,3 +1,2 @@
 // config.ts
-export const API_ENDPOINT = 'http://localhost:3000/api';
-export const BEARER_TOKEN = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzBhMWE3NDRiZjM2NDU4ZjZmOGMyYmYiLCJlbWFpbCI6InV6YWlybWFobWVkYWRtaW5AZ21haWwuY29tIiwidXNlcnR5cGUiOiJhZG1pbiIsImlhdCI6MTcyODc5NzMxNywiZXhwIjoxNzI4ODAwOTE3fQ.OEOU7CQfjubIkHlkmaYh_50zDL6KvMVCBuNCoLjIxSo';
+export const API_ENDPOINT = 'https://calm-retreat-85602-dc9bd7435217.herokuapp.com/api';
