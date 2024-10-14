@@ -14,7 +14,7 @@ const CourseCard: FC<CourseCardProps> = ({course}) => {
             <h2 className='font-bold text-2xl'>{course.courseCode}</h2>
             <h3 className='font-semibold text-xl mb-2'>{course.name}</h3>
             <p>{course.description}</p>
-            <div className='flex w-full h-full justify-end items-end'>
+            <div className='flex w-full h-full justify-end items-end mt-5'>
                 <button onClick={() => navigate(`/${course.courseCode}`)} className='btn btn-neutral'>View Course</button>
             </div>
         </div>

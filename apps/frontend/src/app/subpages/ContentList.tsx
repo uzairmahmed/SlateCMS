@@ -13,17 +13,13 @@ interface ContentProps {
 const ContentList: FC<ContentProps> = ({ contents, course, refresh }) => {
     const [currentDocument, setCurrentDocument] = useState(0);
     return (
-        <div className='flex h-full'>
-            <div className='flex flex-col w-48 h-full border-r p-4'>
-                <div className='font-semibold'>
-                    <ul className="menu text-lg">
-                        {contents.map((content, index) => (
-                            <button className='btn btn-link text-black' onClick={() => setCurrentDocument(index)} key={content.title}>
-                                <h1 className='text-md'>{content.title}</h1>
-                            </button>
-                        ))}
-                    </ul>
-                </div>
+        <div className='flex flex-col md:flex-row h-full'>
+            <div className='flex flex-row md:flex-col w-full md:w-48 md:h-full border-b border-r p-4'>
+                {contents.map((content, index) => (
+                    <button className='btn btn-link text-black h-fit btn-xs md:btn-md' onClick={() => setCurrentDocument(index)} key={content.title}>
+                        <h1 className='text-md'>{content.title}</h1>
+                    </button>
+                ))}
             </div>
 
             <div className='flex flex-col gap-5 p-10 w-full overflow-y-scroll'>

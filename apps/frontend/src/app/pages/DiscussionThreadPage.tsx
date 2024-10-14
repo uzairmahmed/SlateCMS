@@ -6,6 +6,7 @@ import DiscussionReplyForm from '../components/DiscussionReplyForm';
 import { getDiscussionData } from '../../apis/api';
 import { checkLoggedIn } from '../../apis/auth';
 import { useNavigate, useParams } from 'react-router-dom';
+import { MdMenu } from 'react-icons/md';
 
 interface DiscussionThreadPageProps {
 
@@ -38,8 +39,12 @@ const DiscussionThreadPage: FC<DiscussionThreadPageProps> = ({ }) => {
 
     return (
         <div className='flex flex-col h-full w-full overflow-y-scroll'>
-            <div className='flex flex-row w-full p-5 border-b justify-between items-end'>
-                <h1 className='font-bold text-xl'>Discussion</h1>
+            <div className='flex flex-row w-full p-5 border-b justify-between items-center'>
+                <label htmlFor="sidebar-drawer" className="flex md:hidden btn btn-ghost drawer-button">
+                    <MdMenu size={20} />
+                </label>
+
+                <h1 className='font-bold text-xl self-center'>Discussion</h1>
             </div>
             {discussion &&
                 <div className='flex flex-col p-5 gap-5'>

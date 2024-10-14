@@ -16,8 +16,8 @@ import SignupPage from './pages/SignUpPage';
 export function App() {
     return (
         <Router>
-            <div className="flex h-screen w-screen bg-gray-50 overflow-y-hidden">
-                <div className="w-80 border border-solid border-slate-200"></div>
+            <div className="flex flex-col md:flex-row h-screen w-screen bg-gray-50 overflow-y-hidden">
+                <div className="hidden lg:flex w-80 border border-solid border-slate-200"></div>
                 <ToastContainer />
                 <Sidebar/>
                 <Routes>
@@ -28,7 +28,7 @@ export function App() {
                     <Route path="/:courseCode" element={<CourseShell />} />
                     <Route path="/discussion/:discussionID" element={<DiscussionThreadPage />} />
                 </Routes>
-                <div className="w-80 border border-solid border-slate-200"></div>
+                <div className="hidden md:flex md:w-40 lg:w-80 border border-solid border-slate-200"></div>
             </div>
         </Router>
 

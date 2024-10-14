@@ -36,6 +36,8 @@ const LoginPage: FC<LoginPageProps> = ({ }) => {
                 <button type="submit" className='btn btn-neutral'>
                     Login
                 </button>
+
+                <h1 className='text-sm font-semibold'>Don't have an Account? <span className='link-primary'><a href='/signup'>Sign Up.</a></span></h1>
             </form>
         </div>
     );

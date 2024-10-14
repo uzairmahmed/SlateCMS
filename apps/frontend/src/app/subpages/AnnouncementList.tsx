@@ -27,7 +27,7 @@ const AnnouncementList: FC<AnnouncementListProps> = ({ announcements, course, re
                         <h2 className='text-lg w-full align-middle text-center'>No Content</h2>
                     </div>
                 }
-                <div className='flex w-full justify-end gap-5'>
+                <div className='flex flex-col sm:flex-row md:flex-col lg:flex-row w-full justify-end gap-5'>
                     {(getUserDetails().userType === "admin" &&
                         <>
                             <AssignStudentModal courseCode={course.courseCode} course={course} />

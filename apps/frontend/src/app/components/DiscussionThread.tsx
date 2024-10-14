@@ -19,13 +19,13 @@ const DiscussionThread: FC<DiscussionThreadProps> = ({ discussion, viewButton })
             </div>
             <h1 className='text-lg font-semibold'>{discussion.title}</h1>
             <h1 className='text-md'>{discussion.message}</h1>
-            <div className='flex w-full justify-between mt-5'>
+            <div className='flex flex-col md:flex-row w-full justify-between mt-5 gap-7 md:gap-0'>
                 <div className='flex flex-col justify-end'>
                     <h1 className='text-xs'>By discussion.author</h1>
                     <h1 className='text-xs'>Posted on {formatTime(discussion.createdAt)}</h1>
                 </div>
                 <div className='flex flex-col gap-2 justify-end'>
-                    <h1 className='text-xs text-end font-semibold'>{discussion.replies.length} Replies</h1>
+                    <h1 className='text-xs text-center md:text-end font-semibold'>{discussion.replies.length} Replies</h1>
                     {viewButton && <button onClick={() => navigate(`/discussion/${discussion._id}`)} className='btn btn-neutral btn-sm'>View Thread</button>}
                 </div>
             </div>

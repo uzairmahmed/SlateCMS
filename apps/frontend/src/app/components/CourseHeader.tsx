@@ -11,7 +11,7 @@ const CourseHeader: FC<CourseHeaderProps> = ({ course }) => {
 
             <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
 
-            <div className="relative w-full flex flex-col justify-center items-center text-center z-10 py-10">
+            <div className="relative w-full flex flex-col justify-center items-center text-center z-10 py-10 px-10">
                 <h1 className="text-white font-bold text-4xl">{course.courseCode}</h1>
                 <h1 className="text-white font-semibold text-xl">{course.name}</h1>
                 <h1 className="text-white text-lg max-w-xl mb-10">Instructed by {course.teachers[0]?.name}</h1>
