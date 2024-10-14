@@ -14,13 +14,18 @@ export interface User {
     __v: number;
 }
 
+export interface Message {
+    from: string;
+    msg: string;
+}
+
 
 export interface Announcement {
     _id: string;
     uid: string;
     title: string;
     message: string;
-    author: string;
+    author: Author;
     createdAt: string;
     updatedAt: string;
     __v: number;
@@ -30,9 +35,8 @@ export interface Content {
     _id: string;
     uid: string;
     title: string;
-    message: string;
-    documentURL: string;
-    author: string;
+    document: string;
+    author: Author;
     createdAt: string;
     updatedAt: string;
     __v: number;
@@ -43,7 +47,7 @@ export interface DiscussionReply {
     uid: string;
     thread: string;
     message: string;
-    author: string;
+    author: Author;
     createdAt: string;
     updatedAt: string;
     __v: number;
@@ -57,6 +61,7 @@ export interface Discussion {
     replies: DiscussionReply[];
     createdAt: string;
     updatedAt: string;
+    author: Author;
     __v: number;
 }
 
@@ -89,5 +94,10 @@ export interface MinimalCourse {
 export interface CourseWithUsers extends Course {
     students: User[];
     teachers: User[];
-  }
-  
+}
+
+export interface Author {
+    _id: string,
+    email: string,
+    name: string,
+}

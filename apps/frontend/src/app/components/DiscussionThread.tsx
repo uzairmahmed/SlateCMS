@@ -21,7 +21,7 @@ const DiscussionThread: FC<DiscussionThreadProps> = ({ discussion, viewButton })
             <h1 className='text-md'>{discussion.message}</h1>
             <div className='flex flex-col md:flex-row w-full justify-between mt-5 gap-7 md:gap-0'>
                 <div className='flex flex-col justify-end'>
-                    <h1 className='text-xs'>By discussion.author</h1>
+                    <h1 className='text-xs'>By {discussion.author?.name}</h1>
                     <h1 className='text-xs'>Posted on {formatTime(discussion.createdAt)}</h1>
                 </div>
                 <div className='flex flex-col gap-2 justify-end'>

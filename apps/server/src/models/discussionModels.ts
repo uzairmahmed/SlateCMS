@@ -5,8 +5,8 @@ const discussionThreadSchema = new mongoose.Schema({
     uid: { type: String, required: true, unique: true },
     title: { type: String, required: true },
     message: { type: String, required: true },
-    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to Teacher or Student
-    replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'DiscussionReply' }], // List of replies
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Reference to 'User'
+    replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'DiscussionReply' }],
 }, {
     timestamps: true,
 })
@@ -15,7 +15,7 @@ const discussionReplySchema = new mongoose.Schema({
     uid: { type: String, required: true, unique: true },
     thread: { type: mongoose.Schema.Types.ObjectId, ref: 'DiscussionThread' }, // Reference to the parent thread
     message: { type: String, required: true },
-    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to Teacher or Student
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Reference to 'User'
 }, {
     timestamps: true,
 })

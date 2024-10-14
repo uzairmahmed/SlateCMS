@@ -89,7 +89,6 @@ export const getCourses = async (userType: any, userId: any) => {
         };
 
         const response = await axios.request(config);
-        console.log(JSON.stringify(response.data));
         return response.data;
     } catch (error) {
         toast('Error fetching courses')
@@ -188,12 +187,11 @@ export const postAnnouncement = async (courseCode: string, title: string, messag
     }
 }
 
-export const postContent = async (courseCode: string, title: string, message: string, url: string) => {
+export const postContent = async (courseCode: string, title: string, rtf: string) => {
     try {
         let data = {
             "title": title,
-            "message": message,
-            "documentURL": url
+            "document": rtf,
         }
 
         const config = {
@@ -351,4 +349,23 @@ export const assignTeachersToCourse = async (courseCode: string, teacherIds: str
         throw error;
     }
 
+}
+
+export const getAllContent = async () => {
+    try {
+        const config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${API_ENDPOINT}/courses/content/all`,
+            headers: {
+                Authorization: getBearerToken(),
+            },
+        };
+
+        const response = await axios.request(config);
+        return response.data
+    } catch (error) {
+        toast('Error fetching content')
+        throw error;
+    }
 }

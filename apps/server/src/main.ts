@@ -27,6 +27,7 @@ mongoose.connect(mongooseURI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((error) => console.error('Error connecting to MongoDB:', error));
 
+
 app.use('/api', userRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/courses', announcementRoutes);

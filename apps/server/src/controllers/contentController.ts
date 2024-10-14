@@ -9,16 +9,15 @@ export const createContent = async (req: Request, res: Response) => {
     JSON Body:
     {
         "title": <title>,
-        "message": <message>
-        "documentURL": documentURL
+        "document": <docuuemtn>
     }
     */
     try {
-        const { title, message, documentURL } = req.body;
+        const { title, document } = req.body;
         const { courseCode } = req.params;
 
-        if (!title || !message) {
-            return res.status(400).json({ error: 'Title and message are required' });
+        if (!title || !document) {
+            return res.status(400).json({ error: 'Title and document are required' });
         }
 
         const course = await Course.findOne({ courseCode: courseCode })
@@ -29,8 +28,7 @@ export const createContent = async (req: Request, res: Response) => {
         const newContent = new Content({
             uid: uuidv4(),
             title,
-            message,
-            documentURL,
+            document,
             author: req.user._id
         });
 
@@ -54,7 +52,12 @@ export const viewContentByCourse = async (req: Request, res: Response) => {
     */
     try {
         const { courseCode } = req.params;
-        const course = await Course.findOne({ courseCode: courseCode }).populate('content');
+        const course = await Course.findOne({ courseCode: courseCode }).populate({
+            path: 'content',
+            populate: [
+                { path: 'author', select: 'name email' }
+            ]
+        });
 
         if (!course) {
             return res.status(404).json({ error: 'Course not found' });
@@ -71,7 +74,7 @@ export const viewAllContent = async (req: Request, res: Response) => {
     View content given a course id
     */
     try {
-        const contents = await Content.find()
+        const contents = await Content.find().populate({ path: 'author', select: 'name email' })
 
         res.status(200).json(contents);
     } catch (error) {

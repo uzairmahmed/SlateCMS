@@ -17,7 +17,7 @@ const AnnouncementCard: FC<AnnouncementCardProps> = ({ announcement }) => {
             <h1 className='text-lg font-semibold'>{announcement.title}</h1>
             <h1 className='text-md'>{announcement.message}</h1>
             <div className='flex flex-col md:flex-row w-full justify-between mt-5'>
-                <h1 className='text-xs'>By {announcement.author}</h1>
+                <h1 className='text-xs'>By {announcement.author.name}</h1>
                 <h1 className='text-xs'>Posted on {formatTime(announcement.createdAt)}</h1>
             </div>
         </div>

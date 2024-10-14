@@ -26,7 +26,7 @@ export const createDiscussionThread = async (req: Request, res: Response) => {
         }
 
         const newThread = new DiscussionThread({
-            uid: uuidv4(), 
+            uid: uuidv4(),
             title,
             message,
             date: new Date(),
@@ -54,7 +54,10 @@ export const viewDiscussionThreadsByCourse = async (req: Request, res: Response)
         const { courseCode } = req.params;
         const course = await Course.findOne({ courseCode: courseCode }).populate({
             path: 'discussions',
-            populate: { path: 'replies' } 
+            populate: [
+                { path: 'replies', populate: { path: 'author', select: 'name email' } },
+                { path: 'author', select: 'name email' }
+            ]
         });
 
         if (!course) {
@@ -75,7 +78,11 @@ export const viewSpecificDiscussionThread = async (req: Request, res: Response) 
     try {
         const { threadId } = req.params;
 
-        const discussionThread = await DiscussionThread.findById(threadId).populate('replies');
+        const discussionThread = await DiscussionThread.findById(threadId)
+            .populate([
+                { path: 'replies', populate: { path: 'author', select: 'name email' } },
+                { path: 'author', select: 'name email' }
+            ]);
 
         if (!discussionThread) {
             return res.status(404).json({ error: 'Discussion thread not found' });

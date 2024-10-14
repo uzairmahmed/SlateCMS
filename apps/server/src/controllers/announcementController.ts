@@ -59,7 +59,12 @@ export const viewAnnouncementsByCourse = async (req: Request, res: Response) => 
     try {
         const { courseCode } = req.params;
 
-        const course = await Course.findOne({ courseCode: courseCode }).populate('announcements');
+        const course = await Course.findOne({ courseCode: courseCode }).populate({
+            path: 'announcements',
+            populate: [
+                { path: 'author', select: 'name email' }
+            ]
+        });
         if (!course) {
             return res.status(404).json({ error: 'Course not found' });
         }

@@ -48,7 +48,7 @@ const Sidebar: FC<SidebarProps> = ({ }) => {
             </div>
             <div className="divider"></div>
             <div
-                onClick={() => navigate('/knowledgebase')}
+                onClick={() => navigate('/kb')}
                 className="flex flex-row w-full items-center gap-5 px-5 py-5 rounded-xl bg-slate-200 hover:bg-slate-300 transition-all cursor-pointer select-none"
             >
                 <MdLibraryBooks /> Knowledge Base
@@ -57,7 +57,7 @@ const Sidebar: FC<SidebarProps> = ({ }) => {
                 onClick={() => navigate('/ai')}
                 className="flex flex-row w-full items-center gap-5 px-5 py-5 rounded-xl bg-slate-200 hover:bg-slate-300 transition-all cursor-pointer select-none"
             >
-                <MdAndroid /> AI Teacher
+                <MdAndroid /> SlateAI
             </div>
         </>
     );

@@ -16,7 +16,7 @@ const DiscussionReplyCard: FC<DiscussionReplyCardProps> = ({ reply }) => {
             </div>
             <h1 className='text-md font-semibold'>{reply.message}</h1>
             <div className='flex flex-col md:flex-row w-full justify-between mt-5'>
-                <h1 className='text-xs'>By {reply.author}</h1>
+                <h1 className='text-xs'>By {reply.author.name}</h1>
                 <h1 className='text-xs'>Posted on {formatTime(reply.createdAt)}</h1>
             </div>
         </div>

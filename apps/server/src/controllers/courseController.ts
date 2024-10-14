@@ -88,14 +88,23 @@ export const getCourseInfo = async (req: Request, res: Response) => {
     try {
         const { courseCode } = req.params;
         const course = await Course.findOne({ courseCode: courseCode })
-            .populate('announcements')
-            .populate('content')
+            .populate({
+                path: 'announcements',
+                populate: [
+                    { path: 'author', select: 'name email' }
+                ],
+            })
+            .populate({
+                path: 'content',
+                populate: [
+                    { path: 'author', select: 'name email' }
+                ],
+            })
             .populate({
                 path: 'discussions',
-                populate: {
-                    path: 'replies',
-                    model: 'DiscussionReply',
-                },
+                populate: [
+                    { path: 'author', select: 'name email' }
+                ],
             });
 
         if (!course) {
