@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Course } from '../models/courseModels';
 import { Content } from '../models/contentModels';
 import { v4 as uuidv4 } from 'uuid';
-import { Notification } from '../models/notificationModels';
+import { createNotification } from './notificationController';
 
 export const createContent = async (req: Request, res: Response) => {
     /*
@@ -26,10 +26,12 @@ export const createContent = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Course not found' });
         }
 
+
         const newContent = new Content({
             uid: uuidv4(),
             title,
             document,
+            // embedding: ???,
             author: req.user._id
         });
 
@@ -40,13 +42,7 @@ export const createContent = async (req: Request, res: Response) => {
         course.content.push(newContent._id);
         await course.save();
 
-        await Notification.create({
-            type: 'content',
-            message: `New content posted: ${newContent.title}`,
-            course: course._id,
-            recipients: course.students.map(user => user._id),
-        })
-
+        createNotification('content', `New content posted: ${newContent.title}`, course._id, course.students.map(user => user._id))
         res.status(201).json(newContent);
     } catch (error) {
         console.log(error);
@@ -89,3 +85,8 @@ export const viewAllContent = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+
+export const searchContent = async (req: Request, res: Response) => {
+    // ???
+}
