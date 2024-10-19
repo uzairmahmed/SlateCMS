@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { createChatMessage, filterByQuery } from './utilityfunctions';
+import { createChatMessage, createChatMessageWithWeb, filterByQuery } from './utilityfunctions';
 
 export const filterAndAnswer = async (req: Request, res: Response) => {
     try {
-        const { query } = req.body;
+        const { query, searchWeb } = req.body;
 
         if (!query) {
-            return res.status(400).json({ error: 'Query is required' });
+            return res.status(400).json({ error: 'Query and searchWeb Toggle is required' });
         }
 
         const searchResults = await filterByQuery(query);
@@ -34,8 +34,14 @@ export const filterAndAnswer = async (req: Request, res: Response) => {
 
             return 'Unknown content';
         }).join('\n\n');
+        let response = ""
 
-        const response = await createChatMessage(content, query)
+        if (searchWeb) {
+            response = await createChatMessageWithWeb(content, query)
+
+        } else {
+            response = await createChatMessage(content, query)
+        }
 
         res.status(200).json(response);
 

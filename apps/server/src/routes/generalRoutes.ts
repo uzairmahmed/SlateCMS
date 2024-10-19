@@ -4,6 +4,6 @@ import { filterAndAnswer } from "../controllers/generalController";
 
 const router = Router();
 
-router.get('/knowledge/search', verifyToken, verifyAdminOnly, filterAndAnswer);
+router.post('/knowledge/search', verifyToken, verifyAdminOnly, filterAndAnswer);
 
 export default router

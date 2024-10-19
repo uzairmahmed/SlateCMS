@@ -393,3 +393,27 @@ export const getNotifications = async () => {
         throw error;
     }
 }
+
+export const searchWithQuery = async (query: string, searchWeb: boolean) => {
+    try {
+        let data = {
+            "query": query,
+            "searchWeb" : searchWeb
+        }
+        const config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${API_ENDPOINT}/knowledge/search`,
+            headers: {
+                Authorization: getBearerToken(),
+            },
+            data: data
+        };
+
+        const response = await axios.request(config);
+        return response.data
+    } catch (error) {
+        toast('Error fetching content')
+        throw error;
+    }
+} 

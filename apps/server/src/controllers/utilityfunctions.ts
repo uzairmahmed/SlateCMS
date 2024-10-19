@@ -12,25 +12,47 @@ const openai = new OpenAI();
 
 export const createChatMessage = async (content: any, query: string) => {
   const completion = await openai.chat.completions.create({
-    model: "gpt-4o",
+    model: "gpt-4",
     messages: [
       {
-        "role": "system",
-        "content": `You are a knowledgeable assistant. Your job is to answer questions by quoting and referring only to the provided content. When answering, if relevant, include direct quotes from the material and cite specific sections or phrases from it.`
+        role: "system",
+        content: `You are a knowledgeable assistant. Your job is to answer questions by quoting and referring only to the provided content. Please ensure that your answers are formatted in valid Markdown, using headings (##), bold (**), italics (*), and bullet points where necessary.`,
       },
       {
-        "role": "assistant",
-        "content": `Here is the course content you must refer to for answering: ${content}`
+        role: "assistant",
+        content: `Here is the course content you must refer to for answering: ${content}`,
       },
       {
-        "role": "user",
-        "content": query
-      }
+        role: "user",
+        content: query,
+      },
     ],
   });
 
-  return completion.choices[0].message
-}
+  return completion.choices[0].message.content;
+};
+
+export const createChatMessageWithWeb = async (content: any, query: string) => {
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: `You are a knowledgeable assistant. Your job is to answer questions by quoting and optionally referring to the provided content. Please ensure that your answers are formatted in valid Markdown, using headings (##), bold (**), italics (*), and bullet points where necessary.`,
+      },
+      {
+        role: "assistant",
+        content: `Here is the course content you may refer to for answering: ${content}`,
+      },
+      {
+        role: "user",
+        content: query,
+      },
+    ],
+  });
+
+  return completion.choices[0].message.content;
+};
 
 export const filterByQuery = async (query: string) => {
   try {

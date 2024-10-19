@@ -4,7 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { MdMenu, MdSend } from 'react-icons/md';
 import { checkLoggedIn } from '../../apis/auth';
 import { Message, Content } from '../interfaces';
-import { getAllContent } from "../../apis/api";
+import { getAllContent, searchWithQuery } from "../../apis/api";
+import ReactMarkdown from 'react-markdown';
 
 interface AIChatBotPageProps {
 
@@ -12,29 +13,21 @@ interface AIChatBotPageProps {
 
 const AIChatBotPage: FC<AIChatBotPageProps> = ({ }) => {
     const [inputFieldMessage, setInputFieldMessage] = useState("")
-    const [content, setContent] = useState<string[]>([])
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(false)
+    const [searchWeb, setSearchWeb] = useState(false)
 
     const navigate = useNavigate();
-    const openai = new OpenAI({ apiKey: process.env.REACT_APP_OPENAI_API_KEY, dangerouslyAllowBrowser: true });
 
     useEffect(() => {
         const isLoggedIn = checkLoggedIn();
         if (!isLoggedIn) {
             navigate('/login');
         }
-        getData()
         return () => {
 
         };
     }, []);
-
-    const getData = async () => {
-        const data = await getAllContent() as Content[]
-        const payload = data.map(dat => dat.document)
-        setContent(payload)
-    }
 
 
     const askChat = async (inputString: string) => {
@@ -46,33 +39,17 @@ const AIChatBotPage: FC<AIChatBotPageProps> = ({ }) => {
         setMessages(prevMessages => [...prevMessages, newMessage]);
         setInputFieldMessage("")
 
-        const response = await openai.chat.completions.create({
-            model: "gpt-4",  // ensure it's a capable model for long contexts
-            messages: [
-                {
-                    "role": "system",
-                    "content": `You are a knowledgeable assistant. Your job is to answer questions by quoting and referring only to the provided content. When answering, if relevant, include direct quotes from the material and cite specific sections or phrases from it.`
-                },
-                {
-                    "role": "assistant",
-                    "content": `Here is the course content you must refer to for answering: ${content}`
-                },
-                {
-                    "role": "user",
-                    "content": inputString
-                }
-            ]
-        });
+        const messagePayload = await searchWithQuery(inputString, searchWeb)
 
-
-        const messagePayload = response.choices[0].message.content
         const newMessageResponse: Message = {
             from: 'chat',
             msg: messagePayload,
         };
+
         setMessages(prevMessages => [...prevMessages, newMessageResponse]);
         setLoading(false)
     }
+
 
     return (
         <div className='flex flex-col h-full w-full overflow-y-scroll'>
@@ -82,6 +59,10 @@ const AIChatBotPage: FC<AIChatBotPageProps> = ({ }) => {
                 </label>
 
                 <h1 className='font-bold text-xl self-center'>SlateAI</h1>
+                <div className="label cursor-pointer space-x-5">
+                    <span className="label-text">Search the Web?</span>
+                    <input type="checkbox" className="toggle" checked={searchWeb} onClick={() => setSearchWeb(!searchWeb)} />
+                </div>
             </div>
             <div className="flex-grow overflow-y-scroll p-5">
                 <div className="chat chat-start">
@@ -92,7 +73,7 @@ const AIChatBotPage: FC<AIChatBotPageProps> = ({ }) => {
                 {messages.map((msg) => msg.from === 'chat' ?
                     <div className="chat chat-start">
                         <div className="chat-bubble">
-                            {msg.msg}
+                            <ReactMarkdown>{msg.msg}</ReactMarkdown>
                         </div>
                     </div>
                     :
@@ -106,7 +87,7 @@ const AIChatBotPage: FC<AIChatBotPageProps> = ({ }) => {
             </div>
 
             <div className="w-full p-3 border-t sticky bottom-0 bg-white">
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
                     <input
                         type="text"
                         placeholder="Ask Slate"
@@ -114,6 +95,7 @@ const AIChatBotPage: FC<AIChatBotPageProps> = ({ }) => {
                         value={inputFieldMessage}
                         onChange={(e) => setInputFieldMessage(e.target.value)}
                     />
+
                     <button disabled={loading} onClick={() => askChat(inputFieldMessage)} className="btn btn-neutral btn-circle">{loading ? <span className="loading loading-spinner loading-xs"></span> : <MdSend />}</button>
                 </div>
             </div>
