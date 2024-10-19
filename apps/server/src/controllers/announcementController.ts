@@ -3,6 +3,7 @@ import { Course } from '../models/courseModels';
 import { Announcement } from '../models/announcementModels';
 import { v4 as uuidv4 } from 'uuid';
 import { Notification } from '../models/notificationModels';
+import { openAIEmbedding } from '../main';
 
 
 export const createAnnouncement = async (req: Request, res: Response) => {
@@ -27,12 +28,15 @@ export const createAnnouncement = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Course not found' });
         }
 
+        const embedding = await openAIEmbedding.embedQuery(message);
+
         const newAnnouncement = new Announcement({
             uid: uuidv4(),
             title,
             message,
             date: new Date(),
-            author: req.user._id
+            author: req.user._id,
+            embedding: embedding
         });
 
         await newAnnouncement.save();

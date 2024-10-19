@@ -4,6 +4,7 @@ import { Content } from '../models/contentModels';
 import { Student, Teacher, User } from '../models/userModels';
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
+import { openAIEmbedding } from '../main';
 
 export const getAllCourses = async (req: Request, res: Response) => {
     /*
@@ -63,6 +64,8 @@ export const createCourse = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Name, Course Code, and description are required' });
         }
 
+        const embedding = await openAIEmbedding.embedDocuments([description]);
+
         const newCourse = new Course({
             name,
             courseCode,
@@ -71,6 +74,7 @@ export const createCourse = async (req: Request, res: Response) => {
             announcements: [],
             content: [],
             discussions: [],
+            embedding: embedding
         })
 
         await newCourse.save()

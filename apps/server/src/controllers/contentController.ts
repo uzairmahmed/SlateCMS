@@ -3,6 +3,7 @@ import { Course } from '../models/courseModels';
 import { Content } from '../models/contentModels';
 import { v4 as uuidv4 } from 'uuid';
 import { createNotification } from './notificationController';
+import { openAIEmbedding } from '../main';
 
 export const createContent = async (req: Request, res: Response) => {
     /*
@@ -26,23 +27,23 @@ export const createContent = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Course not found' });
         }
 
+        const embedding = await openAIEmbedding.embedDocuments([document]);
 
         const newContent = new Content({
             uid: uuidv4(),
             title,
             document,
-            // embedding: ???,
+            embedding: embedding[0],
             author: req.user._id
         });
 
-        // Save the new announcement
         await newContent.save();
 
-        // Add the announcement to the course
         course.content.push(newContent._id);
         await course.save();
 
         createNotification('content', `New content posted: ${newContent.title}`, course._id, course.students.map(user => user._id))
+
         res.status(201).json(newContent);
     } catch (error) {
         console.log(error);
@@ -85,8 +86,3 @@ export const viewAllContent = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
-
-
-export const searchContent = async (req: Request, res: Response) => {
-    // ???
-}
