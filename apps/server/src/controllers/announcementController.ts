@@ -4,6 +4,7 @@ import { Announcement } from '../models/announcementModels';
 import { v4 as uuidv4 } from 'uuid';
 import { Notification } from '../models/notificationModels';
 import { openAIEmbedding } from '../main';
+import { createNotification } from './notificationController';
 
 
 export const createAnnouncement = async (req: Request, res: Response) => {
@@ -44,12 +45,7 @@ export const createAnnouncement = async (req: Request, res: Response) => {
         course.announcements.push(newAnnouncement._id);
         await course.save();
 
-        await Notification.create({
-            type: 'announcement',
-            message: `New announcement posted: ${newAnnouncement.title}`,
-            course: course._id,
-            recipients: course.students.map(user => user._id),
-        })
+        createNotification('content', `New announcement: ${newAnnouncement.title}`, course._id, course.students.map(user => user._id))
 
         res.status(201).json(newAnnouncement);
     } catch (error) {

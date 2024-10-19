@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { DiscussionReply } from '../interfaces';
 import { MdReply } from 'react-icons/md';
-import { formatTime } from '../../utility/utility';
+import { formatTime } from '../../apis/utility';
 
 interface DiscussionReplyCardProps {
     reply: DiscussionReply

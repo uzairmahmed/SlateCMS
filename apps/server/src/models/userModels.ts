@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     usertype: { type: String, required: true, default: "student" },
     uid: { type: String, required: true },
+    notifications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Notification' }],
     chatHistory: [
         {
             query: { type: String, required: true },

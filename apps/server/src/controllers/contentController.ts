@@ -42,7 +42,7 @@ export const createContent = async (req: Request, res: Response) => {
         course.content.push(newContent._id);
         await course.save();
 
-        createNotification('content', `New content posted: ${newContent.title}`, course._id, course.students.map(user => user._id))
+        createNotification('content', `New content: ${newContent.title}`, course._id, course.students.map(user => user._id))
 
         res.status(201).json(newContent);
     } catch (error) {

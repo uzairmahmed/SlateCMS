@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { Announcement } from '../interfaces';
 import { MdAnnouncement } from "react-icons/md";
-import { formatTime } from "../../utility/utility";
+import { formatTime } from "../../apis/utility";
 
 interface AnnouncementCardProps {
     announcement: Announcement

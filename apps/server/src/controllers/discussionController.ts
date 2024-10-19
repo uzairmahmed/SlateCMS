@@ -4,6 +4,7 @@ import { DiscussionThread, DiscussionReply } from "../models/discussionModels";
 import { v4 as uuidv4 } from 'uuid';
 import { Notification } from '../models/notificationModels';
 import { openAIEmbedding } from '../main';
+import { createNotification } from './notificationController';
 
 export const createDiscussionThread = async (req: Request, res: Response) => {
     /*
@@ -44,13 +45,8 @@ export const createDiscussionThread = async (req: Request, res: Response) => {
         course.discussions.push(newThread._id);
         await course.save();
 
-        await Notification.create({
-            type: 'discussion',
-            message: `New discussion thread: ${newThread.title}`,
-            course: course._id,
-            recipients: course.students.map(user => user._id),
-        })
-
+        createNotification('content', `New discussion thread: ${newThread.title}`, course._id, course.students.map(user => user._id))
+        
         res.status(201).json(newThread);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });

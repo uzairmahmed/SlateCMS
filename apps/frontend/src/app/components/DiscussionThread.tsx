@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { Discussion } from '../interfaces';
 import { MdQuestionAnswer } from 'react-icons/md';
-import { formatTime } from '../../utility/utility';
+import { formatTime } from '../../apis/utility';
 import { useNavigate } from 'react-router-dom';
 
 interface DiscussionThreadProps {

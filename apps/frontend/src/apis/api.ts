@@ -3,6 +3,7 @@ import axios from 'axios';
 import { API_ENDPOINT } from './config';
 import { getBearerToken, saveLoginDetails } from './auth';
 import { toast } from 'react-toastify';
+import { notifyWithCustomToast } from './utility';
 
 export const loginUser = async (email: string, password: string) => {
     const data = JSON.stringify({ email, password });
@@ -385,7 +386,7 @@ export const getNotifications = async () => {
         const response = await axios.request(config);
         const notifications = response.data
         notifications.forEach(notification => {
-            toast(`${notification.course.courseCode}:${notification.message}`)
+            notifyWithCustomToast(notification.message, notification._id)
         });
         // return response.data
     } catch (error) {
@@ -432,6 +433,25 @@ export const getChatHistory = async (userId: any) => {
 
         const response = await axios.request(config);
         return response.data
+    } catch (error) {
+        toast('Error fetching content')
+        throw error;
+    }
+}
+
+export const markNotificationAsRead = async (notificationId: string) => {
+    try {
+        const config = {
+            method: 'delete',
+            maxBodyLength: Infinity,
+            url: `${API_ENDPOINT}/notifications/${notificationId}`,
+            headers: {
+                Authorization: getBearerToken(),
+            },
+        };
+
+        const response = await axios.request(config);
+        return true
     } catch (error) {
         toast('Error fetching content')
         throw error;

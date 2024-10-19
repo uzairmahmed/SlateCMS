@@ -1,7 +1,7 @@
 import { FC, useState } from 'react';
 import { Content } from '../interfaces';
 import PDFViewer from './PDFViewer';
-import { formatTime } from '../../utility/utility';
+import { formatTime } from '../../apis/utility';
 
 interface ContentCardProps {
     content: Content
