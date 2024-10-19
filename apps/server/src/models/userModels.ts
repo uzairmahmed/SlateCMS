@@ -5,8 +5,15 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     phone: { type: String, required: false },
     name: { type: String, required: true },
-    usertype: { type: String, required: true, default: "student"},
+    usertype: { type: String, required: true, default: "student" },
     uid: { type: String, required: true },
+    chatHistory: [
+        {
+            query: { type: String, required: true },
+            response: { type: String, required: true },
+            timestamp: { type: Date, default: Date.now }
+        }
+    ]
 }, {
     timestamps: true,
     discriminatorKey: 'usertype'

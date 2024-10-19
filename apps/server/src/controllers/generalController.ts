@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import { createChatMessage, createChatMessageWithWeb, filterByQuery } from './utilityfunctions';
+import { User } from '../models/userModels';
 
 export const filterAndAnswer = async (req: Request, res: Response) => {
     try {
-        const { query, searchWeb } = req.body;
+        const { userId, query, searchWeb } = req.body;
 
         if (!query) {
             return res.status(400).json({ error: 'Query and searchWeb Toggle is required' });
@@ -41,6 +42,12 @@ export const filterAndAnswer = async (req: Request, res: Response) => {
 
         } else {
             response = await createChatMessage(content, query)
+        }
+
+        const user = await User.findById(userId);
+        if (user) {
+            user.chatHistory.push({ query, response });
+            await user.save();
         }
 
         res.status(200).json(response);

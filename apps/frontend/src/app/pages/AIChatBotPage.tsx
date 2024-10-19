@@ -2,9 +2,9 @@ import OpenAI from "openai";
 import { FC, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MdMenu, MdSend } from 'react-icons/md';
-import { checkLoggedIn } from '../../apis/auth';
+import { checkLoggedIn, getUserDetails } from '../../apis/auth';
 import { Message, Content } from '../interfaces';
-import { getAllContent, searchWithQuery } from "../../apis/api";
+import { getAllContent, getChatHistory, searchWithQuery } from "../../apis/api";
 import ReactMarkdown from 'react-markdown';
 
 interface AIChatBotPageProps {
@@ -18,12 +18,33 @@ const AIChatBotPage: FC<AIChatBotPageProps> = ({ }) => {
     const [searchWeb, setSearchWeb] = useState(false)
 
     const navigate = useNavigate();
+    const userdetails = getUserDetails()
+
 
     useEffect(() => {
         const isLoggedIn = checkLoggedIn();
         if (!isLoggedIn) {
             navigate('/login');
+        } else {
+            const fetchChatHistory = async () => {
+                try {
+                    const details = getUserDetails();
+                    const chatHistory = await getChatHistory(userdetails.userId)
+
+                    const loadedMessages: Message[] = chatHistory.map((chat: { query: string, response: string }) => [
+                        { from: 'me', msg: chat.query },
+                        { from: 'chat', msg: chat.response },
+                    ]).flat();
+
+                    setMessages(loadedMessages);
+                } catch (error) {
+                    console.error('Error loading chat history:', error);
+                }
+            };
+
+            fetchChatHistory();
         }
+
         return () => {
 
         };
@@ -39,7 +60,7 @@ const AIChatBotPage: FC<AIChatBotPageProps> = ({ }) => {
         setMessages(prevMessages => [...prevMessages, newMessage]);
         setInputFieldMessage("")
 
-        const messagePayload = await searchWithQuery(inputString, searchWeb)
+        const messagePayload = await searchWithQuery(inputString, searchWeb, userdetails.userId)
 
         const newMessageResponse: Message = {
             from: 'chat',

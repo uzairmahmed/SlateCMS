@@ -394,11 +394,12 @@ export const getNotifications = async () => {
     }
 }
 
-export const searchWithQuery = async (query: string, searchWeb: boolean) => {
+export const searchWithQuery = async (query: string, searchWeb: boolean, userId: any) => {
     try {
         let data = {
             "query": query,
-            "searchWeb" : searchWeb
+            "searchWeb": searchWeb,
+            "userId": userId
         }
         const config = {
             method: 'post',
@@ -416,4 +417,23 @@ export const searchWithQuery = async (query: string, searchWeb: boolean) => {
         toast('Error fetching content')
         throw error;
     }
-} 
+}
+
+export const getChatHistory = async (userId: any) => {
+    try {
+        const config = {
+            method: 'get',
+            maxBodyLength: Infinity,
+            url: `${API_ENDPOINT}/users/${userId}/chat-history`,
+            headers: {
+                Authorization: getBearerToken(),
+            },
+        };
+
+        const response = await axios.request(config);
+        return response.data
+    } catch (error) {
+        toast('Error fetching content')
+        throw error;
+    }
+}

@@ -198,7 +198,7 @@ export const getAllStudents = async (req: Request, res: Response) => {
     */
     try {
         const users = await User.find({ usertype: 'student' })
-        res.status(200).json(users); 
+        res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -210,7 +210,7 @@ export const getAllTeachers = async (req: Request, res: Response) => {
     */
     try {
         const users = await User.find({ usertype: 'teacher' })
-        res.status(200).json(users);  // Need to add more variables here for user role etc etc
+        res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -222,9 +222,25 @@ export const getAllAdmins = async (req: Request, res: Response) => {
     */
     try {
         const users = await User.find({ usertype: 'admin' })
-        res.status(200).json(users);  // Need to add more variables here for user role etc etc
+        res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+export const getUserChatHistory = async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.params;
+
+        const user = await User.findById(userId).select('chatHistory');
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json(user.chatHistory);
+    } catch (error) {
+        console.error('Error retrieving chat history:', error);
+        res.status(500).json({ error: 'Server error' });
     }
 }
 
