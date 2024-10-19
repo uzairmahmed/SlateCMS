@@ -3,6 +3,7 @@ import { Course } from "../models/courseModels";
 import { DiscussionThread, DiscussionReply } from "../models/discussionModels";
 import { v4 as uuidv4 } from 'uuid';
 import { Notification } from '../models/notificationModels';
+import { openAIEmbedding } from '../main';
 
 export const createDiscussionThread = async (req: Request, res: Response) => {
     /*
@@ -26,13 +27,16 @@ export const createDiscussionThread = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Course not found' });
         }
 
+        const embedding = await openAIEmbedding.embedQuery(message);
+
         const newThread = new DiscussionThread({
             uid: uuidv4(),
             title,
             message,
             date: new Date(),
             author: req.user._id,
-            replies: []
+            replies: [],
+            embedding: embedding
         });
 
         await newThread.save();
@@ -123,12 +127,15 @@ export const createDiscussionThreadReply = async (req: Request, res: Response) =
             return res.status(404).json({ error: 'Discussion thread not found' });
         }
 
+        const embedding = await openAIEmbedding.embedQuery(message);
+
         const newReply = new DiscussionReply({
             uid: uuidv4(),
             thread: threadId,
             message,
             author: req.user._id,
-            date: new Date()
+            date: new Date(),
+            embedding: embedding
         });
 
         await newReply.save();
@@ -136,7 +143,7 @@ export const createDiscussionThreadReply = async (req: Request, res: Response) =
         // Add the reply to the discussion thread
         discussionThread.replies.push(newReply._id);
         await discussionThread.save();
-        
+
         // await Notification.create({
         //     type: 'discussionreply',
         //     message: `New reply to "${discussionThread.title}"`,
