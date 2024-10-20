@@ -4,7 +4,7 @@ import { Content } from '../models/contentModels';
 import { Student, Teacher, User } from '../models/userModels';
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
-import { openAIEmbedding } from '../main';
+import { bucket, openAIEmbedding } from '../main';
 
 export const getAllCourses = async (req: Request, res: Response) => {
     /*
@@ -115,7 +115,39 @@ export const getCourseInfo = async (req: Request, res: Response) => {
             return res.status(404).json({ error: 'Course not found' });
         }
 
-        res.status(200).json(course);
+        let courseObj = course.toObject()
+        
+        delete courseObj.embedding;
+        
+        courseObj.announcements.forEach((announcement: any) => {
+            delete announcement.embedding;
+        });
+
+        courseObj.discussions.forEach((discussion: any) => {
+            delete discussion.embedding;
+        });
+
+        courseObj.content = await Promise.all(courseObj.content.map(async (content: any) => {
+            delete content.embedding;
+            if (content.files && content.files.length > 0) {
+                const signedUrls = [];
+                for (const fileUrl of content.files) {
+                    const fileName = fileUrl.split('/').pop();
+                    const file = bucket.file(fileName);
+        
+                    const [signedUrl] = await file.getSignedUrl({
+                        action: 'read',
+                        expires: Date.now() + 360 * 60 * 1000, // 6 hours
+                    });
+        
+                    signedUrls.push(signedUrl);
+                }
+                content.files = signedUrls; 
+            }
+            return content;
+        }));
+        
+        res.status(200).json(courseObj);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Internal server error' });

@@ -1,31 +1,37 @@
 import { FC, useState } from 'react';
 import { postContent } from '../../apis/api';
-
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-
+import RichTextEditor from './RichTextEditor';
+import FileUpload from './FileUpload';
+import LinkInput from './LinkInput';
 
 interface NewContentModalProps {
-    courseCode: string,
+    courseCode: string;
     refresh: () => void;
 }
 
 const NewContentModal: FC<NewContentModalProps> = ({ courseCode, refresh }) => {
     const [title, setTitle] = useState('');
-    // const [message, setMessage] = useState('');
-    const [rtf, setRtf] = useState('')
-    // const [url, setUrl] = useState('');
+    const [rtf, setRtf] = useState('');
+    const [files, setFiles] = useState<File[]>([]);
+    const [links, setLinks] = useState<string[]>([]);
+
+    const [showRichTextEditor, setShowRichTextEditor] = useState(false);
+    const [showFileUploader, setShowFileUploader] = useState(false);
+    const [showLinkInput, setShowLinkInput] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await postContent(courseCode, title, rtf)
-        setTitle("")
-        // setMessage("")
-        // setUrl("")
-        setRtf("")
-        refresh()
-        document.getElementById("newcontent")?.close()
-    }
+        // console.log({ courseCode: courseCode, title: title, rtf: rtf, files: files, links: links });
+        const postedSuccess = await postContent(courseCode, title, rtf, files, links);
+        if (postedSuccess) {
+            setTitle('');
+            setRtf('');
+            setFiles([]);
+            setLinks([]);
+            refresh();
+            document.getElementById('newcontent')?.close();
+        }
+    };
 
     return (
         <>
@@ -35,23 +41,32 @@ const NewContentModal: FC<NewContentModalProps> = ({ courseCode, refresh }) => {
                     <h3 className="font-bold text-lg">Post new PDF content</h3>
                     <div className='flex flex-col gap-2 mt-2'>
                         <input type="text" placeholder="Title" className="input input-bordered w-full" value={title} onChange={(e) => setTitle(e.target.value)} />
-                        {/* <textarea placeholder="Message" className="textarea textarea-bordered w-full" value={message} onChange={(e) => setMessage(e.target.value)} /> */}
 
-                        <ReactQuill
-                            value={rtf}
-                            onChange={setRtf}
-                            className="w-full"
-                        />
+                        <div className="grid grid-cols-1 md:grid-cols-3 grid-rows-3 md:grid-rows-1 gap-2 mt-4">
+                            <button type="button" className="btn btn-outline" onClick={() => setShowRichTextEditor(!showRichTextEditor)}>
+                                {showRichTextEditor ? 'Remove Text Editor' : 'Add Text'}
+                            </button>
+                            <button type="button" className="btn btn-outline" onClick={() => setShowFileUploader(!showFileUploader)}>
+                                {showFileUploader ? 'Remove File Upload' : 'Upload Files'}
+                            </button>
+                            <button type="button" className="btn btn-outline" onClick={() => setShowLinkInput(!showLinkInput)}>
+                                {showLinkInput ? 'Remove Link Input' : 'Add Links'}
+                            </button>
+                        </div>
 
+                        <div className="mt-4">
+                            {showRichTextEditor && <RichTextEditor rtf={rtf} setRtf={setRtf} />}
+                            {showFileUploader && <FileUpload files={files} setFiles={setFiles} />}
+                            {showLinkInput && <LinkInput links={links} setLinks={setLinks} />}
+                        </div>
                     </div>
                     <div className="modal-action">
-                        {/* <form method="dialog"> */}
                         <button type="submit" className="btn">Post</button>
-                        {/* </form> */}
                     </div>
                 </form>
             </dialog>
         </>
     );
-}
+};
+
 export default NewContentModal;

@@ -9,7 +9,7 @@ import dotenv from 'dotenv'
 import helmet from 'helmet';
 import cors from 'cors';
 import { OpenAIEmbeddings } from '@langchain/openai';
-import OpenAI from "openai";
+import { Storage } from '@google-cloud/storage';
 
 import userRoutes from './routes/userRoutes'
 import courseRoutes from './routes/courseRoutes'
@@ -37,6 +37,20 @@ export const openAIEmbedding = new OpenAIEmbeddings({
   openAIApiKey: process.env.OPENAI_API_KEY
 });
 
+const storage = new Storage({
+  credentials: {
+    type: process.env.GCP_TYPE,
+    project_id: process.env.GCP_PROJECT_ID,
+    private_key_id: process.env.GCP_PRIVATE_KEY_ID,
+    private_key: process.env.GCP_PRIVATE_KEY.replace(/\\n/g, '\n'), 
+    client_email: process.env.GCP_CLIENT_EMAIL,
+    client_id: process.env.GCP_CLIENT_ID,
+    universe_domain: process.env.GCP_UNIVERSE_DOMAIN,
+  },
+  projectId: process.env.GCP_PROJECT_ID,
+});
+
+export const bucket = storage.bucket(process.env.GCP_GCS_BUCKET_NAME);
 
 app.use('/api', userRoutes);
 app.use('/api/courses', courseRoutes);
