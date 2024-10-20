@@ -154,7 +154,7 @@ export const loginUser = async (req: Request, res: Response) => {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ _id: user._id, email: user.email, usertype: user.usertype }, jwtSecret, { expiresIn: '1h' });
+        const token = jwt.sign({ _id: user._id, email: user.email, usertype: user.usertype }, jwtSecret, { expiresIn: '6h' });
         res.status(200).json({ token, user: { _id: user._id, email: user.email, userType: user.usertype } }); // Need to add more variables here for user role etc etc
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });

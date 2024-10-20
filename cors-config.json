@@ -1,0 +1,9 @@
+[
+    {
+      "origin": ["http://localhost:4200", "https://slate-cms.vercel.app"],
+      "method": ["GET", "HEAD", "OPTIONS"],
+      "responseHeader": ["Content-Type"],
+      "maxAgeSeconds": 3600
+    }
+  ]
+  

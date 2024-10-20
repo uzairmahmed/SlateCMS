@@ -3,7 +3,7 @@ import { Course } from '../models/courseModels';
 import { Content } from '../models/contentModels';
 import { v4 as uuidv4 } from 'uuid';
 import { createNotification } from './notificationController';
-import { openAIEmbedding } from '../main';
+import { bucket, openAIEmbedding } from '../main';
 
 export const createContent = async (req: Request, res: Response) => {
     /*
@@ -11,21 +11,55 @@ export const createContent = async (req: Request, res: Response) => {
     JSON Body:
     {
         "title": <title>,
-        "document": <docuuemtn>
+        "document": <rich text content>,
+        "files": [<files>],
+        "links": [<links>]
     }
     */
     try {
-        const { title, document } = req.body;
-        const { courseCode } = req.params;
+        const { title, document, links } = req.body;
+        const { files } = req;
 
-        if (!title || !document) {
-            return res.status(400).json({ error: 'Title and document are required' });
+        const { courseCode } = req.params;
+        const MAX_FILE_SIZE = 250 * 1024 * 1024;
+
+        if (!title) {
+            return res.status(400).json({ error: 'Title is required' });
         }
 
         const course = await Course.findOne({ courseCode: courseCode })
         if (!course) {
             return res.status(404).json({ error: 'Course not found' });
         }
+        
+        const fileUrls = [];
+        if (files && files.length > 0) {
+            for (const file of files) {
+                if (file.size > MAX_FILE_SIZE) {
+                    return res.status(400).json({ error: `File "${file.name}" exceeds the 250MB size limit.` });
+                }
+                const blobName = `${Date.now()}-${file.originalname}`;
+                const blob = bucket.file(blobName);
+
+                const blobStream = blob.createWriteStream({
+                    resumable: false,
+                    contentType: 'auto', 
+                });
+
+                blobStream.on('error', (err) => {
+                    throw new Error('File upload error: ' + err.message);
+                });
+
+                await new Promise((resolve, reject) => {
+                    blobStream.on('finish', resolve);
+                    blobStream.end(file.buffer);
+                });
+
+                const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+                fileUrls.push(publicUrl);
+            }
+        }
+
 
         const embedding = await openAIEmbedding.embedDocuments([document]);
 
@@ -34,7 +68,10 @@ export const createContent = async (req: Request, res: Response) => {
             title,
             document,
             embedding: embedding[0],
-            author: req.user._id
+            author: req.user._id,
+            files: fileUrls,
+            links: JSON.parse(links)
+
         });
 
         await newContent.save();

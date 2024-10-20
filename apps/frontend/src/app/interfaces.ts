@@ -39,6 +39,8 @@ export interface Content {
     author: Author;
     createdAt: string;
     updatedAt: string;
+    files: string[]; 
+    links: string[]; 
     __v: number;
 }
 

@@ -59,26 +59,6 @@ export const signUpUser = async (userType: string, email: string, password: stri
 }
 
 
-export const getAllCourses = async () => {
-    try {
-        const config = {
-            method: 'get',
-            maxBodyLength: Infinity,
-            url: `${API_ENDPOINT}/all`,
-            headers: {
-                Authorization: getBearerToken(),
-            },
-        };
-
-        const response = await axios.request(config);
-        console.log(JSON.stringify(response.data));
-        return response.data;
-    } catch (error) {
-        toast('Error fetching courses')
-        throw error;
-    }
-}
-
 export const getCourses = async (userType: any, userId: any) => {
     try {
         const config = {
@@ -189,12 +169,18 @@ export const postAnnouncement = async (courseCode: string, title: string, messag
     }
 }
 
-export const postContent = async (courseCode: string, title: string, rtf: string) => {
+export const postContent = async (courseCode: string, title: string, rtf: string, files: File[], links: string[]) => {
     try {
-        let data = {
-            "title": title,
-            "document": rtf,
-        }
+        const formData = new FormData();
+        formData.append('title', title);
+
+        formData.append('document', rtf);
+
+        formData.append('links', JSON.stringify(links));
+
+        files.forEach(file => {
+            formData.append('files', file);
+        });
 
         const config = {
             method: 'post',
@@ -202,12 +188,14 @@ export const postContent = async (courseCode: string, title: string, rtf: string
             url: `${API_ENDPOINT}/courses/${courseCode}/content`,
             headers: {
                 Authorization: getBearerToken(),
+                'Content-Type': 'multipart/form-data' // Necessary for file uploads
             },
-            data: data
+            data: formData
         };
 
         const response = await axios.request(config);
         toast('Posted content')
+        return true
     } catch (error) {
         toast('Error posting announcement')
         throw error;
