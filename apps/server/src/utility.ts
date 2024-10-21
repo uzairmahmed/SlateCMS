@@ -1,17 +1,30 @@
-import { Request, Response } from 'express';
-import OpenAI from 'openai';
 import axios from 'axios';
+import OpenAI from 'openai';
 import * as cheerio from 'cheerio';
 const pdfParse = require('pdf-parse');
 const mammoth = require('mammoth');
+import mongoose from 'mongoose';
 
-import { Course } from '../models/courseModels';
-import { Content } from '../models/contentModels';
-import { DiscussionThread, DiscussionReply } from '../models/discussionModels';
-import { Announcement } from '../models/announcementModels';
-import { openAIEmbedding } from '../main';
+import { openAIEmbedding } from './main';
+
+import { Course, Notification, User, Content, DiscussionThread, DiscussionReply, Announcement } from './models';
 
 const openai = new OpenAI();
+
+export const createNotification = async (notType: string, message: string, courseId: mongoose.Types.ObjectId, recipients: any[]) => {
+    const notification = await Notification.create({
+        type: notType,
+        message: message,
+        course: courseId,
+    });
+
+    await User.updateMany(
+        { _id: { $in: recipients } },
+        { $push: { notifications: notification._id } }
+    );
+
+};
+
 
 export const chunkText = (text: string, chunkSize = 3000) => {
     const chunks = [];

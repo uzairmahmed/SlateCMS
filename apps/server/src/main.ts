@@ -1,33 +1,26 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
 import express from 'express';
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import helmet from 'helmet';
 import cors from 'cors';
 import { OpenAIEmbeddings } from '@langchain/openai';
+import { rateLimit } from 'express-rate-limit'
 import { Storage } from '@google-cloud/storage';
 
-import userRoutes from './routes/userRoutes'
-import courseRoutes from './routes/courseRoutes'
-import announcementRoutes from './routes/announcementRoutes'
-import discussionRoutes from './routes/discussionRouter'
-import contentRoutes from './routes/contentRoutes'
-import notificationRoutes from './routes/notificationRoutes'
-import utilityRoutes from './routes/utilityRoutes'
-import generalRoutes from './routes/generalRoutes'
+import router from './routes/routes';
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 const mongooseURI = `mongodb+srv://${process.env.MONGO_DB_USERNAME}:${process.env.MONGO_DB_PASSWORD}@${process.env.MONGO_DB_URL}/?retryWrites=true&w=majority&appName=${process.env.MONGO_DB_NAME}`
 
-app.use(express.json());
-app.use(cors());
-app.use(helmet());
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+	standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+	// store: ... , // Redis, Memcached, etc. See below.
+})
 
 mongoose.connect(mongooseURI)
   .then(() => console.log('Connected to MongoDB'))
@@ -52,14 +45,12 @@ const storage = new Storage({
 
 export const bucket = storage.bucket(process.env.GCP_GCS_BUCKET_NAME);
 
-app.use('/api', userRoutes);
-app.use('/api/courses', courseRoutes);
-app.use('/api/courses', announcementRoutes);
-app.use('/api/courses', discussionRoutes);
-app.use('/api/courses', contentRoutes);
-app.use('/api', notificationRoutes);
-app.use('/api/utility', utilityRoutes);
-app.use('/api/', generalRoutes);
+app.use(express.json());
+app.use(cors());
+app.use(helmet());
+app.use(limiter)
+
+app.use('/api', router);
 
 app.get('/api/hello', (req, res) => {
   res.json({ message: "Hello, Frontend?" })

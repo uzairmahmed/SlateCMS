@@ -1,22 +1,10 @@
 import { Request, Response } from 'express';
-import { Course } from '../models/courseModels';
-import { Content } from '../models/contentModels';
-import { Student, Teacher, User } from '../models/userModels';
 import { v4 as uuidv4 } from 'uuid';
 import mongoose from 'mongoose';
+
 import { bucket, openAIEmbedding } from '../main';
 
-export const getAllCourses = async (req: Request, res: Response) => {
-    /*
-    gets a list of all courses.
-    */
-    try {
-        const courses = await Course.find()
-        res.status(200).json(courses)
-    } catch (error) {
-        res.status(500).json({ error: "Internal server error" })
-    }
-}
+import { Course, Student, Teacher} from '../models';
 
 export const getUserCourses = async (req: Request, res: Response) => {
     /*
@@ -46,7 +34,6 @@ export const getUserCourses = async (req: Request, res: Response) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
-
 
 export const createCourse = async (req: Request, res: Response) => {
     /*
@@ -153,75 +140,6 @@ export const getCourseInfo = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
-
-export const getCourseInfoWithUsers = async (req: Request, res: Response) => {
-    /*
-    course information including announcements, content, and discussions, and teachers and students
-    */
-    try {
-        const { courseCode } = req.params;
-        const course = await Course.findOne({ courseCode: courseCode })
-            .populate('announcements')
-            .populate('content')
-            .populate({
-                path: 'discussions',
-                populate: {
-                    path: 'replies',
-                    model: 'DiscussionReply',
-                },
-            });
-
-        if (!course) {
-            return res.status(404).json({ error: 'Course not found' });
-        }
-
-        const students = await Student.find({ courses: course._id });
-        const teachers = await Teacher.find({ courses: course._id });
-        const detailedCourseInfo = {
-            ...course.toObject(),
-            students,
-            teachers,
-        };
-
-
-        res.status(200).json(detailedCourseInfo);
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
-
-
-export const editCourse = async (req: Request, res: Response) => {
-    /*
-    Edits the course infromation.
-    JSON Body:
-    {
-        "name": <course name>,
-        "description": <course description>
-    }
-    */
-    try {
-        const { courseCode } = req.params;
-        const { name, description } = req.body;
-
-        const updatedCourse = await Course.findOneAndUpdate(
-            { courseCode: courseCode },
-            { name, description },
-            { new: true, runValidators: true }
-        );
-
-        if (!updatedCourse) {
-            return res.status(404).json({ error: 'Course not found' });
-        }
-
-        res.status(200).json(updatedCourse);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
 
 export const assignStudentsToCourse = async (req: Request, res: Response) => {
     /*

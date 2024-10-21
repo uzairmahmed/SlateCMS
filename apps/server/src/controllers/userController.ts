@@ -1,14 +1,12 @@
+import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
-import { Request, Response } from 'express';
 import dotenv from 'dotenv';
 
-import { User } from '../models/userModels';
+import { User } from '../models';
 
-// Source: https://medium.com/@ravipatel.it/building-a-secure-user-registration-and-login-api-with-express-js-mongodb-and-jwt-10b6f8f3741d
-
-dotenv.config();
+dotenv.config()
 const jwtSecret = process.env.JWT_SECRET || 'uzair';
 
 export const registerAdmin = async (req: Request, res: Response) => {

@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
-import { createChatMessage, createChatMessageWithWeb, filterByQuery } from './utilityfunctions';
-import { User } from '../models/userModels';
+
+import { createChatMessage, createChatMessageWithWeb, filterByQuery } from '../utility';
+
+import { User } from '../models';
 
 export const filterAndAnswer = async (req: Request, res: Response) => {
     try {

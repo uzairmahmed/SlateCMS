@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import { Course } from "../models/courseModels";
-import { DiscussionThread, DiscussionReply } from "../models/discussionModels";
 import { v4 as uuidv4 } from 'uuid';
-import { Notification } from '../models/notificationModels';
+
 import { openAIEmbedding } from '../main';
-import { createNotification } from './notificationController';
+import { createNotification } from '../utility';
+
+import { DiscussionThread, DiscussionReply } from "../models";
 
 export const createDiscussionThread = async (req: Request, res: Response) => {
     /*
@@ -46,33 +47,8 @@ export const createDiscussionThread = async (req: Request, res: Response) => {
         await course.save();
 
         createNotification('content', `New discussion thread: ${newThread.title}`, course._id, course.students.map(user => user._id))
-        
+
         res.status(201).json(newThread);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
-export const viewDiscussionThreadsByCourse = async (req: Request, res: Response) => {
-    /*
-    View discussion threads given a course id
-    - includeReplies: Boolean to include replies in the response.
-    */
-    try {
-        const { courseCode } = req.params;
-        const course = await Course.findOne({ courseCode: courseCode }).populate({
-            path: 'discussions',
-            populate: [
-                { path: 'replies', populate: { path: 'author', select: 'name email' } },
-                { path: 'author', select: 'name email' }
-            ]
-        });
-
-        if (!course) {
-            return res.status(404).json({ error: 'Course not found' });
-        }
-
-        res.status(200).json(course.discussions);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }

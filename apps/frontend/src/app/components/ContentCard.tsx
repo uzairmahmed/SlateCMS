@@ -41,12 +41,12 @@ const ContentCard: FC<ContentCardProps> = ({ content }) => {
             </div>
             <div className='divider'></div>
 
-            <div className='grid grid-rows-3 md:grid-rows-1 grid-cols-1 md:grid-cols-3 gap-5 mb-5'>
+            <div className='grid grid-rows-1 xl:grid-rows-1 grid-cols-1 xl:grid-cols-3 gap-5 mb-5'>
                 {content.links.map(link =>
                     <LinkPreview link={link} />
                 )}
             </div>
-            <div className='grid grid-rows-3 md:grid-rows-1 grid-cols-1 md:grid-cols-3 gap-5'>
+            <div className='grid grid-rows-1 xl:grid-rows-1 grid-cols-1 xl:grid-cols-3 gap-5'>
                 {content.files.map(file =>
                     <FileViewPreview
                         filepath={file}

@@ -14,7 +14,7 @@ const ContentList: FC<ContentProps> = ({ contents, course, refresh }) => {
     const [currentDocument, setCurrentDocument] = useState(0);
     return (
         <div className='flex flex-col md:flex-row h-full'>
-            <div className='flex flex-row md:flex-col w-full md:w-48 md:h-full border-b border-r p-4'>
+            <div className='flex flex-row md:flex-col w-full md:w-48 md:h-full border-b border-r p-4 overflow-y-auto md:overflow-y-scroll overflow-x-scroll md:overflow-x-auto'>
                 {contents.map((content, index) => (
                     <button className='btn btn-link text-black h-fit btn-xs md:btn-md' onClick={() => setCurrentDocument(index)} key={content.title}>
                         <h1 className='text-md'>{content.title}</h1>

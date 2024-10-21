@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+
+import { chunkText, extractTextFromFile, scrapeUrl, createNotification } from '../utility';
+import { bucket, openAIEmbedding } from '../main';
+
 import { Course } from '../models/courseModels';
 import { Content } from '../models/contentModels';
-import { v4 as uuidv4 } from 'uuid';
-import { createNotification } from './notificationController';
-import { bucket, openAIEmbedding } from '../main';
-import { chunkText, extractTextFromFile, scrapeUrl } from './utilityfunctions';
 
 export const createContent = async (req: Request, res: Response) => {
     /*
@@ -23,10 +24,6 @@ export const createContent = async (req: Request, res: Response) => {
 
         const { courseCode } = req.params;
         const MAX_FILE_SIZE = 250 * 1024 * 1024;
-
-        if (!title) {
-            return res.status(400).json({ error: 'Title is required' });
-        }
 
         const course = await Course.findOne({ courseCode: courseCode })
         if (!course) {
@@ -125,29 +122,6 @@ export const createContent = async (req: Request, res: Response) => {
         res.status(201).json(newContent);
     } catch (error) {
         console.log(error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
-export const viewContentByCourse = async (req: Request, res: Response) => {
-    /*
-    View content given a course id
-    */
-    try {
-        const { courseCode } = req.params;
-        const course = await Course.findOne({ courseCode: courseCode }).populate({
-            path: 'content',
-            populate: [
-                { path: 'author', select: 'name email' }
-            ]
-        });
-
-        if (!course) {
-            return res.status(404).json({ error: 'Course not found' });
-        }
-
-        res.status(200).json(course.content);
-    } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
