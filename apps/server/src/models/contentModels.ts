@@ -5,9 +5,11 @@ const contentSchema = new mongoose.Schema({
     title: { type: String, required: true },
     document: { type: String },
     author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Reference to Teacher or Admin
-    embedding: { type: [Number] },
+    embeddings: { type: [[Number]] }, // Array of embeddings 
     files: { type: [String] },
     links: { type: [String] },
+    parsedFiles: [{ fileName: String, fileType: String, fileData: String }],
+    parsedLinks: [{ linkDomain: String, linkUrl: String, linkData: String }],
 }, {
     timestamps: true,
 })

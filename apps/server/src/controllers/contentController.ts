@@ -4,6 +4,7 @@ import { Content } from '../models/contentModels';
 import { v4 as uuidv4 } from 'uuid';
 import { createNotification } from './notificationController';
 import { bucket, openAIEmbedding } from '../main';
+import { chunkText, extractTextFromFile, scrapeUrl } from './utilityfunctions';
 
 export const createContent = async (req: Request, res: Response) => {
     /*
@@ -31,19 +32,28 @@ export const createContent = async (req: Request, res: Response) => {
         if (!course) {
             return res.status(404).json({ error: 'Course not found' });
         }
-        
+
         const fileUrls = [];
+        let fileContents = []
+        let parsedFileData = []
+        let parsedLinkData = []
+
         if (files && files.length > 0) {
             for (const file of files) {
                 if (file.size > MAX_FILE_SIZE) {
                     return res.status(400).json({ error: `File "${file.name}" exceeds the 250MB size limit.` });
                 }
+
+                const ext = file.originalname.split('.').pop().toLowerCase();
+                const extractedText = await extractTextFromFile(file, ext);
+                fileContents.push(extractedText)
+
                 const blobName = `${Date.now()}-${file.originalname}`;
                 const blob = bucket.file(blobName);
 
                 const blobStream = blob.createWriteStream({
                     resumable: false,
-                    contentType: 'auto', 
+                    contentType: 'auto',
                 });
 
                 blobStream.on('error', (err) => {
@@ -57,21 +67,53 @@ export const createContent = async (req: Request, res: Response) => {
 
                 const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
                 fileUrls.push(publicUrl);
+
+                parsedFileData.push({
+                    fileName: file.originalname,
+                    fileType: ext,
+                    fileData: extractedText
+                })
+
             }
         }
 
+        // console.log(JSON.parse(links).map);
+        const urlContents = await Promise.all(
+            JSON.parse(links).map(async url => {
+                const extractedText = await scrapeUrl(url)
+                const { hostname } = new URL(url);
 
-        const embedding = await openAIEmbedding.embedDocuments([document]);
+                parsedLinkData.push({
+                    linkDomain: hostname,
+                    linkUrl: url,
+                    linkData: extractedText
+                })
+
+                return extractedText
+            })
+        )
+
+        const allContent = [document, ...urlContents, ...fileContents].join('\n--- (Next Information Block) ---\n')
+        const contentsToEmbed = chunkText(allContent);
+
+
+        const embeddings = await Promise.all(
+            contentsToEmbed.map(async (chunk) => {
+                const result = await openAIEmbedding.embedDocuments([chunk])
+                return result.flat();
+            })
+        );
 
         const newContent = new Content({
             uid: uuidv4(),
             title,
             document,
-            embedding: embedding[0],
+            embeddings: embeddings,
             author: req.user._id,
             files: fileUrls,
-            links: JSON.parse(links)
-
+            links: JSON.parse(links),
+            parsedFiles: parsedFileData,
+            parsedLinks: parsedLinkData,
         });
 
         await newContent.save();
@@ -80,7 +122,6 @@ export const createContent = async (req: Request, res: Response) => {
         await course.save();
 
         createNotification('content', `New content: ${newContent.title}`, course._id, course.students.map(user => user._id))
-
         res.status(201).json(newContent);
     } catch (error) {
         console.log(error);

@@ -162,6 +162,7 @@ export const postAnnouncement = async (courseCode: string, title: string, messag
 
         const response = await axios.request(config);
         toast('Posted announcement')
+        if (JSON.stringify(response.data).length > 6500) toast.error('Your content may not be fully visible by SlateAI. Please split long lessons into multiple shorter ones.')
 
     } catch (error) {
         toast('Error posting announcement')

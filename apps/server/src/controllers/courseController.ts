@@ -128,7 +128,7 @@ export const getCourseInfo = async (req: Request, res: Response) => {
         });
 
         courseObj.content = await Promise.all(courseObj.content.map(async (content: any) => {
-            delete content.embedding;
+            delete content.embeddings;
             if (content.files && content.files.length > 0) {
                 const signedUrls = [];
                 for (const fileUrl of content.files) {
